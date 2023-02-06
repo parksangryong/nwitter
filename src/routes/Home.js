@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { dbService } from "fbase";
-import { addDoc, collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 import Nweet from "components/Nweet";
+import NweetFactory from "components/NweetFactory";
 
 const Home = ({userObj}) => {
-    const [nweet, setNweet] = useState("");
     const [nweets, setNweets] = useState([]);
 
     useEffect(() => {
@@ -17,28 +17,9 @@ const Home = ({userObj}) => {
         });
     }, []);
 
-    const onSubmit = async (event) => {
-        event.preventDefault();
-        await addDoc(collection(dbService, "nweets"), {
-            text: nweet,
-            createdAt: Date.now(),
-            creatorId : userObj.uid,
-          });
-          setNweet("");
-    };
-
-    const onChange = (event) => {
-        event.preventDefault();
-        const{target:{value}} = event;
-        setNweet(value);
-    };
-
     return(
         <>
-        <form onSubmit={onSubmit}>
-            <input value={nweet} onChange={onChange} type="text" placeholder="what's on your mind?" maxLength={120} />
-            <input type="submit" value="Nweet" />
-        </form>
+        <NweetFactory userObj={userObj} />
         <div>
             {nweets.map((nweet) => (
                 <Nweet key={nweet.id} nweetObj={nweet} isOwner={nweet.creatorId === userObj.uid} />
